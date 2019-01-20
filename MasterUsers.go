@@ -3,10 +3,7 @@ package main
 import (
 	"errors"
 	"github.com/LiamDotPro/Go-Multitenancy/helpers"
-	"github.com/LiamDotPro/Go-Multitenancy/tenants"
 	"github.com/jinzhu/gorm"
-	"os"
-	"strings"
 )
 
 type MasterUser struct {
@@ -108,33 +105,6 @@ func deleteMasterUser(id uint) (string, error) {
 	}
 
 	return "The user has been successfully deleted", nil
-}
-
-// Create's a tenant using a domain identifier
-func createNewTenant(subDomainIdentifier string) (msg string, err error) {
-
-	// Create new database to hold client.
-	if err := Connection.Exec("CREATE DATABASE " + strings.ToLower(subDomainIdentifier) + " OWNER admin").Error; err != nil {
-		return "error making the database", err
-	}
-
-	var connectionInfo = tenants.TenantConnectionInformation{TenantSubDomainIdentifier: subDomainIdentifier, ConnectionString: "host="+os.Getenv("dbHost") + " port=" + os.Getenv("dbPort") + " user=" + os.Getenv("dbUser") +" dbname=" + subDomainIdentifier + " password=" + os.Getenv("dbPassword") + " sslmode=disable"}
-
-	if err := Connection.Create(&connectionInfo).Error; err != nil {
-		return "error inserting the new database record", err
-	}
-
-	tenConn, tenConErr := connectionInfo.GetConnection()
-
-	if tenConErr != nil {
-		return "error creating the connection using connection method", err
-	}
-
-	if migrateErr := migrateTenantTables(tenConn); migrateErr != nil {
-		return "error attempting to migrate the existing tables to new database", migrateErr
-	}
-
-	return "New Tenant has been successfully made", nil
 }
 
 // Get a specific user from the database.

@@ -18,14 +18,12 @@ func setupUsersRoutes(router *gin.Engine) {
 
 	// POST
 	users.POST("create", HandleCreateUser)
-	users.POST("login", HandleLogin)
+	users.POST("login", HandleCustomerLogin(Store), HandleLogin)
 	users.POST("updateUserDetails", HandleUpdateUserDetails)
-	users.POST("testPoster", HandleTestPoster)
 
 	// GET
 	users.GET("getUserById", HandleGetUserById)
 	users.GET("getCurrentUser", HandleGetCurrentUser)
-	users.GET("testGetter", HandleCustomerLogin(Store), HandleTestGetter)
 
 	// DELETE
 	users.DELETE("deleteUser", HandleDeleteUser)
@@ -124,7 +122,7 @@ func HandleLogin(c *gin.Context) {
 	session, exists := c.Get("session")
 
 	if !exists {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Something went wrong while trying to process that, please try again.", "error": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": "Something went wrong while trying to process that, please try again."})
 		return
 	}
 
@@ -244,9 +242,6 @@ func HandleGetCurrentUser(c *gin.Context) {
 	// Get the currently logged int user id.
 	userId := c.MustGet("userId")
 
-	// Get the database object from the connection.
-	db, _ := c.Get("connection")
-
 	outcome, err := getUser(userId.(uint))
 
 	if err != nil {
@@ -258,45 +253,6 @@ func HandleGetCurrentUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Successfully found user",
 		"user":    outcome,
-	})
-
-}
-
-func HandleTestGetter(c *gin.Context) {
-
-	session, err := c.Get("session")
-
-	if !err {
-		fmt.Println("session not found")
-	}
-
-	fmt.Printf("%#v\n", session.(*sessions.Session).Values["client"])
-
-	fmt.Printf("%#v\n", session.(*sessions.Session).Values["client"].(CustomerProfile).LoginAttempts["test"]["test@liam.pro"])
-
-	// Save changes to our session.
-	if err := Store.Save(c.Request, c.Writer, session.(*sessions.Session)); err != nil {
-		fmt.Print(err)
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Test Ran successfully",
-	})
-
-}
-
-func HandleTestPoster(c *gin.Context) {
-
-	sessionValues, err := Store.Get(c.Request, "connect.s.id")
-
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	fmt.Printf("%#v\n", sessionValues)
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Test Ran successfully",
 	})
 
 }

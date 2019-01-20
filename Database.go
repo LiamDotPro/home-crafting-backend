@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
-	"github.com/LiamDotPro/Go-Multitenancy/tenants"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/wader/gormstore"
@@ -56,18 +55,6 @@ func startDatabaseServices() {
 
 // Migrates the application tables.
 func migrateTables() error {
-
-	if err := Connection.AutoMigrate(&tenants.TenantConnectionInformation{}).Error; err != nil {
-		return err
-	}
-
-	if err := Connection.AutoMigrate(&TenantSubscriptionInformation{}).Error; err != nil {
-		return err
-	}
-
-	if err := Connection.AutoMigrate(&TenantSubscriptionType{}).Error; err != nil {
-		return err
-	}
 
 	if err := Connection.AutoMigrate(&MasterUser{}).Error; err != nil {
 		return err
