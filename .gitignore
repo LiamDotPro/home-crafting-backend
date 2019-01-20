@@ -14,8 +14,8 @@
 ./docs
 docs
 gin.log
-Go-Multitenancy
-./Go-Multitenancy
+home-crafting-backend
+./home-crafting-backend
 .env
 /.env
 .idea

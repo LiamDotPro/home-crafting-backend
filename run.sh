@@ -1,4 +1,4 @@
 #!/bin/bash
 swag init
 go build
-sudo ./Go-Multitenancy
+sudo ./home-crafting-backend
