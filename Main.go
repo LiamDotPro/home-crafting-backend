@@ -13,6 +13,8 @@ import (
 	"runtime"
 )
 
+var Router *gin.Engine
+
 func main() {
 
 	// load environment variables from file.
@@ -38,25 +40,23 @@ func main() {
 	startDatabaseServices()
 
 	// init router
-	router := gin.Default()
+	Router := gin.Default()
 
-	router.Use(CORSMiddleware())
+	// Enable cors support.
+	Router.Use(CORSMiddleware())
 
 	// Setting up our routes on the router.
+	SetupUserRoutes(Router)
 
-	// Users
-	setupUsersRoutes(router)
-
-	// Master Users
-	setupMasterUsersRoutes(router)
+	SetupMasterRoutes(Router)
 
 	// Add routing for swag
 	if os.Getenv("environment") == "development" {
-		router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		Router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// Starting the router instance
-	if err := router.Run(port); err != nil {
+	if err := Router.Run(port); err != nil {
 		fmt.Print(err)
 
 	}

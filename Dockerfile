@@ -6,6 +6,6 @@ COPY . .
 
 RUN go get -d -v ./...
 RUN go build
-RUN ./Go-Multitenancy
+RUN ./home-crafting-backend
 
 MAINTAINER Liam Read
